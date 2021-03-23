@@ -1,0 +1,12 @@
+name: Vokabeln
+title: Vokabeln
+username:
+account: vwle
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3835073
+bundleId: 4383143
+url: https://vwle.shinyapps.io/Vokabeln/
+when: 1616480409.98477
+asMultiple: FALSE
+asStatic: FALSE
