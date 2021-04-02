@@ -23,9 +23,15 @@ mkr.formatnumeric <- function(val,digits=3){
 
 # Glaobale Variablen definieren -----------------------------------------
 
-vocdf <- read_excel("EnglischVokabelnacess1.xlsx")
-names(vocdf)
 
+# Sort the input dataframe into random order (and add an "answered" flag)
+vocdf <- read_excel("EnglischVokabelnacess1.xlsx") %>% 
+  mutate(Random=runif(nrow(.)),
+         CorrectlyAnswered=FALSE
+         ) %>% 
+      arrange(Random)
+names(vocdf)
+    
 #seldf <- vocdf %>% filter(Unit == "Unit2") %>% mutate(select = 0)
 #testdf <- sample_n(seldf,1) %>% mutate(select = 1)
 
