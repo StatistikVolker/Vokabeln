@@ -26,16 +26,14 @@ shinyServer(function(input, output,session) {
     
     partdf <- reactive({
         req(input$Part)
-        #if (v$teller == 1){
-        unitdf() %>% filter(Part %in% input$Part) %>% mutate(Tipp = 0)
-        #} else {
-        #    unitdf() %>% filter(!deutsch %in% v$auswahl)
-        #}
-        
+        unitdf() %>% filter(Part %in% input$Part) #%>% mutate(Tipp = 0)
         })
     
     seldf <- reactive({
-        partdf() %>% filter(Tipp == 0)
+        #partdf() %>% filter(Tipp == 0)
+        input$proove
+        partdf() %>% filter(!AnsweredCorrectly) %>% head(1)
+        
     })
  
     observeEvent(input$Unit,{
@@ -47,33 +45,31 @@ shinyServer(function(input, output,session) {
         input$Part
     })
                         
-    rowid <- reactive({
-        if (dim(seldf())[1]> 0  | (dim(seldf())[1]> 0 & input$weiter)) {sample_n(seldf(),1)}
-        #if (dim(partdf())[1]> 0  | (dim(partdf())[1]> 0 & input$weiter)) {sample_n(partdf(),1)}
-    })
+    #rowid <- reactive({
+    #    if (dim(seldf())[1]> 0  | (dim(seldf())[1]> 0 & input$weiter)) {sample_n(seldf(),1)}
+    #    #if (dim(partdf())[1]> 0  | (dim(partdf())[1]> 0 & input$weiter)) {sample_n(partdf(),1)}
+    #})
 
-    observeEvent(partdf(), {
-        v$auswahl <- rowid()$deutsch
-        updateTextInput(inputId = "ger",value = v$auswahl)
-    })
+    #observeEvent(partdf(), {
+    #    v$auswahl <- rowid()$deutsch
+    #    updateTextInput(inputId = "ger",value = v$auswahl)
+    #})
     
     observeEvent(input$test,{
-       if (input$eng == rowid()$english) {
+       if (input$eng == seldf()$english[1]) {
+           vocdf <- vocdf %>% 
+               mutate(CorrectlyAnswered=ifelse(
+                       English == input$answerText, 
+                       TRUE, 
+                       CorrectlyAnswered
+                   )
+               )
            v$Bewertung <- "Fein gemacht"
-           v$Auswahl <- rowid()$deutsch
+           v$Auswahl <- seldf()$deutsch
            
-           output$Kontrolle <- renderTable({
-               partdf <- partdf() 
-               partdf$Tipp[partdf$deutsch == v$Auswahl] <- 1
-               partdf
-               
-           })
+ 
        } else {
            v$Bewertung <- paste("Korekt ist",rowid()$english)
-           output$Kontrolle <- renderTable({
-               partdf <- partdf()
-               partdf
-           })
        }
     })
     
