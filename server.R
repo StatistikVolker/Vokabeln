@@ -17,88 +17,85 @@ shinyServer(function(input, output,session) {
                         teller = 1,
                         auswahl = "")
     
-#    teller = teller+1
     
+    # Datensatz auf Unit einschränken
     unitdf <- reactive({
+        df <- analysed %>% filter(CorrectlyAnswered == FALSE)
         req(input$Unit)
-        vocdf %>% filter(Unit %in% input$Unit)
+        df <- df %>% filter(Unit %in% input$Unit)
+        df
     })
     
+    # Datensatz auf Part in Unit einschränken
     partdf <- reactive({
         req(input$Part)
         unitdf() %>% filter(Part %in% input$Part) #%>% mutate(Tipp = 0)
         })
     
+    # Variable auswählen
     seldf <- reactive({
-        #partdf() %>% filter(Tipp == 0)
         input$proove
-        partdf() %>% filter(!AnsweredCorrectly) %>% head(1)
-        
+        partdf() %>% head(1)
+        #updateTextInput(inputId = "ger",value = partdf()$deutsch[1])
     })
- 
+    
+    
+
+    # Parts je nach gewählter Unit anzeigen
     observeEvent(input$Unit,{
         parts <- unique(unitdf()$Part)
         updateCheckboxGroupInput(session, inputId= "Part", label = "Wähle den Abschnitt aus:",choices = parts, selected=parts)
     }, ignoreNULL=FALSE)
     
+    # Ausgewählte(r) Part pro Unit
     selpart <- reactive({
         input$Part
     })
-                        
-    #rowid <- reactive({
-    #    if (dim(seldf())[1]> 0  | (dim(seldf())[1]> 0 & input$weiter)) {sample_n(seldf(),1)}
-    #    #if (dim(partdf())[1]> 0  | (dim(partdf())[1]> 0 & input$weiter)) {sample_n(partdf(),1)}
-    #})
-
-    #observeEvent(partdf(), {
-    #    v$auswahl <- rowid()$deutsch
-    #    updateTextInput(inputId = "ger",value = v$auswahl)
-    #})
     
+    observeEvent(input$Part, {
+        updateTextInput(inputId = "ger",value = seldf()$deutsch)
+    })
+                        
+    # Antwort auf richtigkeit testen
     observeEvent(input$test,{
-       if (input$eng == seldf()$english[1]) {
-           vocdf <- vocdf %>% 
-               mutate(CorrectlyAnswered=ifelse(
-                       English == input$answerText, 
-                       TRUE, 
-                       CorrectlyAnswered
-                   )
-               )
+        if (input$eng == seldf()$english[1]) {
            v$Bewertung <- "Fein gemacht"
            v$Auswahl <- seldf()$deutsch
-           
- 
+           #analysed
        } else {
-           v$Bewertung <- paste("Korekt ist",rowid()$english)
+           v$Bewertung <- paste("Korekt ist",seldf()$english)
+           #analysed
        }
+       #analysed
     })
     
-    #partdf2 <- eventReactive(input$test, {
-    #    partdf <- partdf() 
-    #    partdf$Tipp[partdf$deutsch == rowid()$deutsch] <- 1
-    #    partdf
-    #}) 
-
+    # Aufruf der nächsten Variable
     observeEvent(input$weiter,{
+        if (input$eng == seldf()$english[1]) {
+            isolate({    # Funktion isolate(), um ....
+                analysed <<- analysed %>%   # Doppelpfeilzuweisung (<<-), um ...
+                    mutate(CorrectlyAnswered=ifelse(english == input$eng, TRUE, CorrectlyAnswered))
+                #mutate(CorrectlyAnswered = (english == input$eng)) %>%
+                #filter(!CorrectlyAnswered)
+            })
+            #print(input$eng)
+        }
         updateTextInput(inputId = "eng",value= "")
-        updateTextInput(inputId = "ger",value = rowid()$deutsch)
+        updateTextInput(inputId = "ger",value = seldf()$deutsch)
         v$Bewertung <- ""
-        v$teller = v$teller + 1
+        v$teller <- v$teller+1
     })
 
+    # Kontrolltext erzeugen
     output$Bewertung <- renderText({
         v$Bewertung
-        #unit()
     })
     
-    output$Zaehler <- renderText({paste(v$teller,"von", dim(seldf())[1])})
-    output$testtext <- renderText({summary(partdf()$Tipp)})
     
-    #output$Kontrolle <- renderTable(partdf2())
-    
-    #output$Kontrolle({
-    #    ctrltab()
-    #})
-    
+    # Output definieren
+    output$Zaehler <- renderText({paste(v$teller,"von", dim(partdf())[1])})
+    #output$testtext <- renderText({summary(partdf()$Tipp)})
+    output$Kontrolle <- renderTable({analysed})
+
  
 })
