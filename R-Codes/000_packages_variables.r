@@ -31,8 +31,7 @@ vocdf <- read_excel("EnglischVokabelnacess1.xlsx") %>%
          ) %>% 
       arrange(Random)
 names(vocdf)
-    
-#seldf <- vocdf %>% filter(Unit == "Unit2") %>% mutate(select = 0)
-#testdf <- sample_n(seldf,1) %>% mutate(select = 1)
+   
+# Take a copy for delayed updates
+analysed <- vocdf
 
-#seldf <- seldf %>% filter(!deutsch %in% testdf$deutsch)
