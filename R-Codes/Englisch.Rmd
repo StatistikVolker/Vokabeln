@@ -1,0 +1,455 @@
+<!-- C19J_HotL_MitarbeiterHL.Rmd -->
+
+Auswahl der Vokabeln
+=======================================================================
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+Dashboard erstellt von   
+Volker Holzendorf  
+<holzendorf@gmx.eu>
+
+### Auswahl der zu lernenden Vokabeln
+
+```{r}
+
+# Sprachauswahl
+
+
+
+# Sprachauswahl
+uiOutput("VOK_SPRACHE")
+output$VOK_SPRACHE <- renderUI({
+  selectInput(
+    inputId = "VOK_SPRACHE",
+    label = "Wähle eine Sprache",
+    choices = labSprache[1],
+    selected = labSprache[1]
+  )
+})
+```
+
+```{r}
+# Auswahl Klasse
+uiOutput("VOK_KLASSE")
+observeEvent(input$VOK_SPRACHE,{
+  req(input$VOK_SPRACHE)
+  output$VOK_KLASSE <- renderUI({
+    selectInput(
+      inputId = "VOK_KLASSE",
+      label = "In welcher Klassenstufe bist Du?",
+      choices = c("",unique(dbENGLISCH$CLASS)),
+      selected = ""
+    )
+  })
+})
+```
+
+```{r}
+# Auswahl Lektion
+uiOutput("VOK_LEKTION")
+observeEvent(input$VOK_KLASSE,{
+  req(input$VOK_KLASSE)
+  output$VOK_LEKTION <- renderUI({
+    selectInput(
+      inputId = "VOK_LEKTION",
+      label = "Welche Lektion willst Du lernen?",
+      choices = c("",unique(dbENGLISCH$UNIT[dbENGLISCH$CLASS == input$VOK_KLASSE])),
+      selected = ""
+    )
+  })
+})
+```
+
+```{r}
+# Auswahl Teil
+uiOutput("VOK_UNITPART")
+observeEvent(input$VOK_LEKTION,{
+  req(input$VOK_LEKTION)
+  output$VOK_UNITPART <- renderUI({
+    checkboxGroupInput(
+      inputId = "VOK_UNITPART",
+      label = "Wähle den Abschnitt aus der Lektion aus:",
+      choices = c("<ohne weitere Angabe>",unique(dbENGLISCH$PART[dbENGLISCH$UNIT == input$VOK_LEKTION & dbENGLISCH$CLASS == input$VOK_KLASSE]))
+    )
+  })
+})
+```
+
+```{r}
+
+
+#output$SRM_Fahrtag <- renderUI({
+#     dateInput(
+#          inputId = "SRM_Fahrtag",
+#          label = "Trainingstag",
+#          value = mkr.nextweekday(Sys.Date(), 5),
+#          daysofweekdisabled = c(1,2,3,5,6,7),
+#          format = "dd. MM yyyy",
+#          startview = "month",
+#          weekstart = 1,
+#          language = "de"
+#          )
+#})
+
+
+```
+
+### --------------------------------------------------------------------------------------
+
+```{r}
+
+#uiOutput("SRM_ZSFG")
+#observeEvent(input$SRM_Fahrtag, {
+#     output$SRM_ZSFG <- renderUI({
+##      req(input$SRM_Fahrtag)
+#       actionButton(inputId = "SRM_ZSFG",
+#                    label = "Zusammenfassung",
+#                    icon = icon("check"),
+#                    width = "220px"
+#                    )
+#     
+#     })
+#})
+```
+
+```{r}
+#Ergebnis in Datenbank schreiben
+#observeEvent(input$SRM_ZSFG2,{
+#     ##KINDER Tabelle wegschreiben
+#  K_update <- as.character()
+#  # [1] "Datum" 
+#  K_update[1] <- strFahrtag()
+#  # [2] "EMMA"        
+#  K_update[2] <- mkr.KFMdb(input$cb_Emma)
+## # [3] "KILIAN"
+#  K_update[3] <- mkr.KFMdb(input$cb_Kilian)
+#  # [4] "LOTTE"
+#  K_update[4] <- mkr.KFMdb(input$cb_Lotte)
+#  # [5] "MARA"
+#  K_update[5] <- mkr.KFMdb(input$cb_Mara)
+#  # [6] "MATS"
+#  K_update[6] <- mkr.KFMdb(input$cb_Mats)
+#  # [7] "ROBERT"
+#  K_update[7] <- mkr.KFMdb(input$cb_Robert)
+#  print(K_update)
+#  # Wegschreiben in Datenbank
+#  dbExecute(con, "INSERT OR REPLACE INTO KINDER VALUES (?,?,?,?,?,?,?)", params = K_update)
+#print("K_update in DB")
+#  # MUTTIS Tabelle wegschreiben
+#  if (input$cb_M_Antje == TRUE) {
+#       mkr.MFKdb(mutti = "Antje",zusatz = input$NP_M_Antje, datum = strFahrtag())
+#  }
+#print("Antje_update in DB")
+#  if (input$cb_M_Taube == TRUE) {
+#       mkr.MFKdb(mutti = "Taube",zusatz = input$NP_M_Taube, datum = strFahrtag())
+#  }
+#print("Taube_update in DB")
+#  if (input$cb_M_Anja == TRUE) {
+#       mkr.MFKdb(mutti = "Anja",zusatz = NULL, datum = strFahrtag())
+#  }
+#print("Anja_update in DB")
+#  if (input$cb_M_Frank == TRUE) {
+#       mkr.MFKdb(mutti = "Frank",zusatz = NULL, datum = strFahrtag())
+#  }
+#print("Frank_update in DB")
+#  if (input$cb_M_Joerg == TRUE) {
+#       mkr.MFKdb(mutti = "Jörg",zusatz = NULL, datum = strFahrtag())
+#  }
+#print("Joerg_update in DB")
+#  if (input$cb_M_Saskia == TRUE) {
+#       mkr.MFKdb(mutti = "Saskia",zusatz = NULL, datum = strFahrtag())
+#  }
+#print("Saskia_update in DB")
+#  if (input$cb_M_Volker == TRUE) {
+#       mkr.MFKdb(mutti = "Volker",zusatz = NULL, datum = strFahrtag())
+#  }
+# print("Volker_update in DB")
+# print("M_update in DB")
+#
+#  # Leeren der Eingabemaske
+#  # Kinder
+#    updateCheckboxInput(session, "cb_Emma", "Emma", value = FALSE)
+#    updateCheckboxInput(session, "cb_Kilian", "Kilian", value = FALSE)
+#    updateCheckboxInput(session, "cb_Lotte", "Lotte", value = FALSE)
+#    updateCheckboxInput(session, "cb_Mara", "Mara", value = FALSE)
+#    updateCheckboxInput(session, "cb_Mats", "Mats", value = FALSE)
+ #   updateCheckboxInput(session, "cb_Robert", "Robert", value = FALSE)
+#    
+# print("K geleert")
+#   
+# # Muttis
+#    updateCheckboxInput(session, "cb_M_Antje", "Antje", value = FALSE)
+#    updateCheckboxInput(session, "cb_M_Taube", "Taube (Universum)", value = FALSE)
+#    updateCheckboxInput(session, "cb_M_Anja", "Anja", value = FALSE)
+#    updateCheckboxInput(session, "cb_M_Frank", "Frank", value = FALSE)
+#    updateCheckboxInput(session, "cb_M_Joerg", "Jörg", value = FALSE)
+#    updateCheckboxInput(session, "cb_M_Saskia", "Saskia", value = FALSE)
+#    updateCheckboxInput(session, "cb_M_Volker", "Volker", value = FALSE)
+#  
+# print("M geleert")
+# print("Datum:")
+# print(as.Date(strFahrtag()))
+#    
+#    # Datum neu füllen
+#         updateDateInput(session,
+#          inputId = "SRM_Fahrtag",
+#          label = "Trainingstag",
+#          value = mkr.nextweekday(as.Date(strFahrtag()), 5)+7
+#          #value = ""
+#          )
+#         
+#print("Datum update")
+#          
+# source("R-Codes/021_zusammenfassungleeren.r",local=TRUE)
+# output$SRM_ZSFG <- renderUI({ "" })
+#
+# print("Buttons entfernt")
+#       
+#  # Lade Datenbank erneut
+#  source("R-Codes/011_loadSRM.r")
+# print("DB neu geladen")
+# 
+
+#})
+```
+
+
+```{r}
+#strFahrtag <- reactive({
+#     req(input$SRM_Fahrtag)
+#     format(input$SRM_Fahrtag,"%Y-%m-%d")
+#     #as.Date(input$SRM_Fahrtag, format = "%Y-%m-%d")
+#})
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+Column
+-------------------------------------------------------------------------
+
+### <font size="5"> Du lernst <b>`r reactive(input$VOK_SPRACHE)` Klasse `r reactive(input$VOK_KLASSE)` `r  reactive(input$VOK_LEKTION)`  </b> </font>
+
+
+```{r}
+uiOutput("GERMAN")
+uiOutput("ENGLISH")
+uiOutput("TESTWORD")
+uiOutput("NEXTWORD")
+
+output$GERMAN <- renderUI({
+  textInput(
+    inputId = "GERMAN",
+    label = "Was ist ... auf Englisch?",
+    value = ""
+    )
+})
+
+output$ENGLISH <- renderUI({
+textInput(
+  inputId = "ENGLISH",
+  label = "Write in English here:",
+  value = "")
+})
+
+
+output$TESTWORD <- renderUI({
+  actionButton(
+    inputId = "TESTWORD",
+    label = "Proove"
+    )
+})
+
+output$NEXTWORD <- renderUI({
+  actionButton(
+    inputId = "NEXTWORD",
+    label = "Next word"
+  )
+})
+
+```
+
+```{r}
+observeEvent(input$TESTWORD, {
+  # Hier Text gut gemacht, leider falsch
+  # Ergbnis in Datenbank schreiben
+  # Datum ablegen
+
+    })
+
+observeEvent(input$NEXTWORD, {
+  # Hier:
+  # nächstes Word laden
+  
+    })
+
+
+
+
+
+
+
+
+```
+
+### Trainingswillige
+
+```{r}
+
+NKFM <- reactive({
+     as.numeric(input$cb_Emma) +
+     as.numeric(input$cb_Kilian) +
+     as.numeric(input$cb_Lotte)  +
+     as.numeric(input$cb_Mara) +
+     as.numeric(input$cb_Mats) +
+     as.numeric(input$cb_Robert)# +
+     })
+
+
+renderValueBox({
+     valueBox(NKFM(), caption = "Trainingswillige", icon = "fa_children", color = "forestgreen")
+})
+```
+
+
+
+Column
+-------------------------------------------------------------------------
+
+### <font size="5"> SkirolerMuttis am <b>`r reactive(format(input$SRM_Fahrtag,"%d. %B %Y"))` </b> </font>
+
+
+```{r}
+M_Anja <- reactive({
+     req(input$SRM_Fahrtag)
+  SRM_MUTTIS %>% 
+    filter(DATUM == strFahrtag() & SRM_NAME == "Anja") # & AUTHOR_SRM_NAME == input$SRM_Fahrtag)
+})
+M_Antje <- reactive({
+     req(input$SRM_Fahrtag)
+  SRM_MUTTIS %>% 
+    filter(DATUM == strFahrtag() & SRM_NAME == "Antje") # & AUTHOR_SRM_NAME == input$SRM_Fahrtag)
+})
+M_Frank <- reactive({
+     req(input$SRM_Fahrtag)
+  SRM_MUTTIS %>% 
+    filter(DATUM == strFahrtag() & SRM_NAME == "Frank") # & AUTHOR_SRM_NAME == input$SRM_Fahrtag)
+})
+M_Joerg <- reactive({
+     req(input$SRM_Fahrtag)
+  SRM_MUTTIS %>% 
+    filter(DATUM == strFahrtag() & SRM_NAME == "Jörg") # & AUTHOR_SRM_NAME == input$SRM_Fahrtag)
+})
+M_Saskia <- reactive({
+     req(input$SRM_Fahrtag)
+  SRM_MUTTIS %>% 
+    filter(DATUM == strFahrtag() & SRM_NAME == "Saskia") # & AUTHOR_SRM_NAME == input$SRM_Fahrtag)
+})
+M_Volker <- reactive({
+     req(input$SRM_Fahrtag)
+  SRM_MUTTIS %>% 
+    filter(DATUM == strFahrtag() & SRM_NAME == "Volker") # & AUTHOR_NAME == input$SRM_Fahrtag)
+})
+M_Taube <- reactive({
+     req(input$SRM_Fahrtag)
+  SRM_MUTTIS %>% 
+    filter(DATUM == strFahrtag() & SRM_NAME == "Taube") # & AUTHOR_NAME == input$SRM_Fahrtag)
+})
+
+```
+
+
+```{r}
+checkboxInput("cb_M_Antje", "Antje")
+selectInput("NP_M_Antje","Plätze im teilauto",choices = list("0","4","5","6","7","8"))
+checkboxInput("cb_M_Taube", "Taube (Universum)")
+selectInput("NP_M_Taube","Plätze im Auto",choices = list("0","4","5","6"))
+checkboxInput("cb_M_Anja", "Anja")
+checkboxInput("cb_M_Frank", "Frank")
+checkboxInput("cb_M_Joerg", "Jörg")
+checkboxInput("cb_M_Saskia", "Saskia")
+checkboxInput("cb_M_Volker", "Volker")
+#checkboxInput("cb_Emma", "Emma")
+
+```
+
+```{r}
+observeEvent(input$SRM_Fahrtag, {
+    updateCheckboxInput(session, "cb_M_Antje", "Antje", value = mkr.MFK(M_Antje()))
+    updateCheckboxInput(session, "cb_M_Taubee", "Taube (Universum)", value = mkr.MFK(M_Taube()))
+    updateCheckboxInput(session, "cb_M_Anja", "Anja", value = mkr.MFK(M_Anja()))
+    updateCheckboxInput(session, "cb_M_Frank", "Frank", value = mkr.MFK(M_Frank()))
+    updateCheckboxInput(session, "cb_M_Joerg", "Jörg", value = mkr.MFK(M_Joerg()))
+    updateCheckboxInput(session, "cb_M_Saskia", "Saskia", value = mkr.MFK(M_Saskia()))
+    updateCheckboxInput(session, "cb_M_Volker", "Volker", value = mkr.MFK(M_Volker()))
+    #updateCheckboxInput(session, "cb_Emma", "Emma", value = mkr.KFM("EMMA"))
+    #updateCheckboxInput(session, "cb_Emma", "Emma", value = mkr.KFM("EMMA"))
+  })
+
+observeEvent(input$cb_M_Antje, {
+         updateSelectInput(session, "NP_M_Antje","Plätze im teilauto",choices = list("0","4","5","6","7","8"))
+})
+observeEvent(input$cb_M_Taube, {
+    updateSelectInput(session, "NP_M_Taube","Plätze im Auto",choices = list("0","4","5","6"))
+})
+
+
+
+```
+### Autos
+
+```{r}
+# Anzahl fahrende Mütter/ Autos
+NMFK <- reactive({
+     as.numeric(input$cb_M_Antje) +
+     as.numeric(input$cb_M_Anja) +
+     as.numeric(input$cb_M_Frank)  +
+     as.numeric(input$cb_M_Joerg) +
+     as.numeric(input$cb_M_Saskia) +
+     as.numeric(input$cb_M_Volker) +
+     as.numeric(input$cb_M_Taube) #+
+     })
+
+#renderText({
+#     NKFM()
+#})
+
+
+renderValueBox({
+     valueBox(NMFK(), caption = "verfügbare Autos", icon = "fa_car", color = "cornflowerblue")
+})
+```
+
+### Plätze in Autos
+
+```{r}
+# Anzahl fahrende Mütter/ Autos
+NPLTZ <- reactive({
+     as.numeric(input$NP_M_Antje) +
+     mkr.NPLTZ("Anja",SRM_MUTTIMETA,input$cb_M_Anja) +
+     mkr.NPLTZ("Frank",SRM_MUTTIMETA,input$cb_M_Frank) +
+     mkr.NPLTZ("Jörg",SRM_MUTTIMETA,input$cb_M_Joerg) +
+     mkr.NPLTZ("Saskia",SRM_MUTTIMETA,input$cb_M_Saskia) +
+     mkr.NPLTZ("Volker",SRM_MUTTIMETA,input$cb_M_Volker) +
+     as.numeric(input$NP_M_Taube) #+
+     })
+
+#renderText({
+#     NKFM()
+#})
+
+
+renderValueBox({
+     valueBox(NPLTZ(), caption = "verfügbare Plätze", icon = "fa_couch", color = "purple")
+})
+```
+
+
