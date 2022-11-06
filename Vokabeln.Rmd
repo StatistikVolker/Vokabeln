@@ -1,0 +1,55 @@
+---
+title: "Vokabeltrainer"
+author: 
+output: 
+  flexdashboard::flex_dashboard:
+    
+    orientation: columns
+    vertical_layout: scroll
+    navbar:
+      - { title: "Schule am Palmengarten", href: "https://schule-am-palmengarten.de/schulfaecher/englisch" }
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+# Loginmaske für flexdashboards:
+# https://datastorm-open.github.io/shinymanager/
+
+
+# Pakete einlesen
+Sys.setlocale("LC_TIME", "German")
+options(shiny.fullstacktrace = TRUE)
+#Sys.setlocale("LC_TIME", "de_DE") 
+source("R-Codes/001_packages.r")
+#source("R-Codes/002_funktionen.r")
+source("R-Codes/011_loadVokabeln.r")
+
+# Labels
+labSprache <- c("Englisch","Spanisch","Französisch")
+
+
+```
+
+
+```{r}
+# R-Markdown Basics
+# https://www.markdownguide.org/basic-syntax/
+
+# Icons:
+# https://fontawesome.com/v5.15/icons?d=gallery
+# https://fontawesome.com/v5.15/icons?d=gallery&p=2&m=free
+# Link to use Icons in R:
+# https://www.displayr.com/adding-icons-to-dashboards-using-font-awesome/
+```
+
+```{r}
+#Page Editierung:
+# Auswahlkaskade über Titel, Version
+# Später: Autor
+# Button: Save to Dateabase
+```
+
+```{r, child="R-Codes/Englisch.Rmd"}
+```
+
+
